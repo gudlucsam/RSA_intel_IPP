@@ -1,10 +1,8 @@
 #include "ippcp.h"
 #include "ippcore.h"
-
 #include <stdlib.h>
 #include <iostream>
 #include <stdio.h>
-
 #include <vector>
 #include <iterator>
 
@@ -13,14 +11,14 @@ using namespace std;
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// functions for manipulating Big integer numbers
-// MOST OF THESE FUNCTIONS ARE INTELL IPP SOURCE CODE
+//MOST OF THESE FUNCTIONS ARE INTELL IPP SOURCE CODE
+// THESE SOURCE ARE PASTED HERE FOR VIEWING, HOWEVER,
+// THESE CODE ARE AVAILABLE IN YOUR HEADER FILES ONCE INTEL IPP IS LINKED TO YOUR PROJECT
 //HOWEVER A FEW FUNCTIONS ARE MODIFIED OR INCLUDED TO SUIT MY IMPLEMENTATION
+// SKIP TO THE RSA_sample() FOR THE RSA IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
 
-#if !defined _BIGNUMBER_H_
-#define _BIGNUMBER_H_
-
+//===Classes for handling Intel Big Number====//
 class BigNumber
 {
 public:
@@ -104,14 +102,13 @@ protected:
 
 // convert bit size into 32-bit words
 #define BITSIZE_WORD(n) ((((n)+31)>>5))
-#endif // _BIGNUMBER_H_
 
 
 // implementation of BigNum object classes defined above
 void BigNumber::tBN(const char* Msg) {
-	/*
-		This function prints a representation of IPP BigNum Object
-	*/
+
+	// This function prints a representation of IPP BigNum Object
+	
 	//get state of BigNum
 	const IppsBigNumState* BNR = this->m_pBN;
 
@@ -548,20 +545,13 @@ ostream& operator << (ostream &os, const BigNumber& a)
 	os << s.c_str();
 	return os;
 }
-////////////////////////////////////////////////////
-// END BIGNUM FUNCTIONS IMPLEMENTATIONS
-//////////////////////////////////////////////////
+//===End Big Number function implementation===//
 
 
 
 
 
-/////////////////////////////////////////////////
-// Functions for Prime Num generators 
-////////////////////////////////////////////////
-
-#if !defined _CPOBJS_H_
-#define _CPOBJS_H_
+//===Functions for Prime Num generators===//
 
 
 #define BITS_2_WORDS(n) (((n)+31)>>5)
@@ -583,7 +573,6 @@ void deletePrimeGen(IppsPrimeState* pPrime);
 IppsDLPState* newDLP(int lenM, int lenL);
 void deleteDLP(IppsDLPState* pDLP);
 
-#endif // _CPOBJS_H_
 
 // implement abstract functions above
 
@@ -685,10 +674,7 @@ void deleteDLP(IppsDLPState* pDLP)
 {
 	delete[](Ipp8u*)pDLP;
 }
-
-//////////////////////////////////////////////////////
-// End prime Num generator functions
-/////////////////////////////////////////////////////
+//===End prime Num generator functions===//
 
 
 
@@ -698,7 +684,9 @@ void deleteDLP(IppsDLPState* pDLP)
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////
 //=========MAIN RSA PROGRAM OPTIMIZED WITH IPP CRYPTOGRAPHIC FUNCTIONS=============//
+////////////////////////////////////////////////////////////////////////////////////
 
 int RSA_sample()
 {
@@ -736,13 +724,11 @@ int RSA_sample()
 	int buffSize = buffSizePrivate; 
 	scratchBuffer = new Ipp8u[buffSize];
 
-
 	// random generator
 	IppsPRNGState* pRand = newPRNG();
 
 	// prime generator
 	IppsPrimeState* pPrimeG = newPrimeGen(512);
-
 
 	// validate keys
 	int validateRes = IS_VALID_KEY;
@@ -751,7 +737,7 @@ int RSA_sample()
 		10, pPrimeG, ippsPRNGen, pRand);
 
 	if (IS_VALID_KEY == validateRes) {
-		cout << "validation successful" << endl;
+		cout << "validation successful \n" << endl;
 	}
 
 	// keys generator
@@ -761,7 +747,7 @@ int RSA_sample()
 
 	// check for successfull generation of keys
 	if (status == ippStsNoErr) {
-		cout << "keys generation successful" << endl;
+		cout << "keys generation successful \n" << endl;
 	}
 
 	// delete generators
@@ -773,7 +759,7 @@ int RSA_sample()
 
 	// get modulus generated
 	BigNumber modN(pModulus);
-	modN.tBN("Modulus: ");
+	modN.tBN("Modulus (n): ");
 
 	// get public key generated 
 	BigNumber Pk(pPublicExp);
@@ -825,7 +811,7 @@ int RSA_sample()
 
 	// check for successfull encryption of msg
 	if (status1 == ippStsNoErr) {
-		cout << "message encryption successful" << endl;
+		cout << "message encryption successful \n" << endl;
 	}
 
 	//
@@ -836,7 +822,7 @@ int RSA_sample()
 
 	// check for successfull encryption of msg
 	if (status2 == ippStsNoErr) {
-		cout << "message decryption successful" << endl;
+		cout << "message decryption successful \n" << endl;
 	}
 
 	// compare plaintext and decrypted message
