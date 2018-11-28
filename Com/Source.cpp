@@ -97,8 +97,8 @@ protected:
 	bool create(const Ipp32u* pData, int length, IppsBigNumSGN sgn = IppsBigNumPOS);
 	int compare(const BigNumber&) const;
 	IppsBigNumState* m_pBN;
-	
-}; 
+
+};
 
 // convert bit size into 32-bit words
 #define BITSIZE_WORD(n) ((((n)+31)>>5))
@@ -108,7 +108,7 @@ protected:
 void BigNumber::tBN(const char* Msg) {
 
 	// This function prints a representation of IPP BigNum Object
-	
+
 	//get state of BigNum
 	const IppsBigNumState* BNR = this->m_pBN;
 
@@ -119,7 +119,7 @@ void BigNumber::tBN(const char* Msg) {
 	ippsGet_BN(&sgn, &sBNR, dBNR, BNR); // getting BNR sign and data
 	int size = sBNR;
 
-	
+
 	BigNumber BigNum(dBNR, size, sgn); // initial  BigNum
 
 	IppsBigNumState* BN = BigNum.Ctx(); // create(dBNR, size, sgn);// neglecting sign
@@ -690,39 +690,40 @@ void deleteDLP(IppsDLPState* pDLP)
 
 int RSA_sample()
 {
-	int keyCtxSize;
 
-	Ipp8u * scratchBuffer = NULL;
-
-	Ipp32u E = { 0x11 };
-	IppsBigNumState* pSrcPublicExp = newBN(1, &E);
+	// specify the context of key components contain generated data
 	IppsBigNumState* pModulus = newBN(1024 / 32, NULL);
 	IppsBigNumState* pPublicExp = newBN(1024 / 32, NULL);
 	IppsBigNumState* pPrivateExp = newBN(1024 / 32, NULL);
 
+
 	// (bit) size of key components
-	int bitsN = 1024;
-	int bitsE = 512;
-	int bitsP = 512;
-	int bitsQ = 512;
+	int bitsN = 1024; // Length of RSA system in bits(the modulus)size of                           //our modulus, must be large(4096 standard)
 
-	// define and setup public key
+	int bitsE = 512; // Length of the RSA public exponent in bits(the e //component
+	int bitsP = 512; // Length in bits of the p factors of the modulus(that //is, the p in the equation: n = p*q
+	int bitsQ = 512;// Length in bits of the q factors of the modulus(that //is, the p in the equation: n = p*q
+
+	int keyCtxSize; // Available size of memory buffer being initialized
+
+	// setup public key
 	ippsRSA_GetSizePublicKey(bitsN, bitsE, &keyCtxSize);
-	IppsRSAPublicKeyState* pPub = (IppsRSAPublicKeyState*)(new Ipp8u[keyCtxSize]);
-	ippsRSA_InitPublicKey(bitsN, bitsE, pPub, keyCtxSize);
+	IppsRSAPublicKeyState* pPub = (IppsRSAPublicKeyState*)(new Ipp8u[keyCtxSize]); //public key state allocated with generated buffer //size
+	ippsRSA_InitPublicKey(bitsN, bitsE, pPub, keyCtxSize); //context //initialized in memory
 
-	// define and setup (type2) private key
+
+	// setup (type2) private key
 	ippsRSA_GetSizePrivateKeyType2(bitsP, bitsQ, &keyCtxSize);
 	IppsRSAPrivateKeyState* pPrv = (IppsRSAPrivateKeyState*)(new Ipp8u[keyCtxSize]);
 	ippsRSA_InitPrivateKeyType2(bitsP, bitsQ, pPrv, keyCtxSize);
 
-	// allocate scratch buffer
-	int buffSizePublic;
-	ippsRSA_GetBufferSizePublicKey(&buffSizePublic, pPub);
-	int buffSizePrivate;
-	ippsRSA_GetBufferSizePrivateKey(&buffSizePrivate, pPrv);
-	int buffSize = buffSizePrivate; 
-	scratchBuffer = new Ipp8u[buffSize];
+
+	int buffSizePrivate; // create variable to hold retrieved size
+	ippsRSA_GetBufferSizePrivateKey(&buffSizePrivate, pPrv); //retrieve //buffer size for private key
+
+	Ipp8u * scratchBuffer = NULL; //initialize scratch buffer as ipp8u //(usigned char equivalent)
+	scratchBuffer = new Ipp8u[buffSizePrivate]; //allocate memory for //scratch buffer
+
 
 	// random generator
 	IppsPRNGState* pRand = newPRNG();
@@ -730,53 +731,63 @@ int RSA_sample()
 	// prime generator
 	IppsPrimeState* pPrimeG = newPrimeGen(512);
 
+
 	// validate keys
-	int validateRes = IS_VALID_KEY;
+	int validateRes = IS_VALID_KEY; // IS_VALID_KEY is the success code
+
 	ippsRSA_ValidateKeys(&validateRes,
 		pPub, pPrv, NULL, scratchBuffer,
 		10, pPrimeG, ippsPRNGen, pRand);
-
+	// check for success code, and print message on successful
 	if (IS_VALID_KEY == validateRes) {
 		cout << "validation successful \n" << endl;
 	}
 
-	// keys generator
-	IppStatus status;
-	status = ippsRSA_GenerateKeys(pSrcPublicExp, pModulus, pPublicExp, pPrivateExp, pPrv, scratchBuffer,
-		10, pPrimeG, ippsPRNGen, pRand);
 
-	// check for successfull generation of keys
+	// Pointer to IppsBigNumState context for searching an RSA public //exponent
+	Ipp32u E = { 0x11 };
+	IppsBigNumState* pSrcPublicExp = newBN(1, &E);
+
+	IppStatus status; // reference to generated message code
+
+	// keys generator
+	status = ippsRSA_GenerateKeys(pSrcPublicExp, pModulus, pPublicExp, pPrivateExp, pPrv, scratchBuffer, 10, pPrimeG, ippsPRNGen, pRand);
+
+	// check for successful generation of keys
 	if (status == ippStsNoErr) {
 		cout << "keys generation successful \n" << endl;
 	}
 
-	// delete generators
-	deletePrimeGen(pPrimeG);
-	deletePRNG(pRand);
-
-
-	// Retrieving Components of RSA states
-
 	// get modulus generated
-	BigNumber modN(pModulus);
-	modN.tBN("Modulus (n): ");
+	BigNumber modN(pModulus); // create BigNumber instance
+	modN.tBN("Modulus (n): "); // display key data
+
+	cout << "\n" << endl; // print empty line
 
 	// get public key generated 
-	BigNumber Pk(pPublicExp);
-	Pk.tBN("Public Key Exponent (e): ");
+	BigNumber Pk(pPublicExp); // create BigNumber instance
+	Pk.tBN("Public Key Exponent (e): "); // display key data
+
+	cout << "\n" << endl; // print empty line
 
 	//get private key generated
-	BigNumber Pvk(pPrivateExp);
-	Pvk.tBN("Private Key Exponent (d): ");
+	BigNumber Pvk(pPrivateExp); // create BigNumber instance
+	Pvk.tBN("Private Key Exponent (d): "); // display key data
+	
+	cout << "\n" << endl; // print empty line
 
-	// public key components retrieved 
+	// set public key with generated public key
 	ippsRSA_SetPublicKey(pModulus, pPublicExp, pPub);
-	// set up type1 private key components
+
+	// set up type1 private key component with generated private key
 	ippsRSA_SetPrivateKeyType1(pModulus, pPrivateExp, pPrv);
 
-	// Encrypt AND Decrypt Message
 
-	Ipp32u dataM[] = { // plain text
+	// Assuming that we have message that we want to encrypt,
+	// we will first convert it to value using some defined scheme.
+	// Assuming the converted format is Ipp32u format dataM, now lets encrypt it.
+
+	Ipp32u dataM[] = { // plain text to be encrypted
 		0x12345678,0xabcde123,0x87654321,
 		0x111aaaa2,0xbbbbbbbb,0xcccccccc,
 		0x12237777,0x82234587,0x1ef392c9,
@@ -788,63 +799,76 @@ int RSA_sample()
 		0xfec55267,0x11111111,0x98765432,
 		0x54376511,0x21323111,0x85433abc,0xcaa44322,0x001234ef };
 
+	// we will create ciphertext context with size of dataN
 	Ipp32u dataN[] = { // data for ciphertext context creation
-		0x03cccb37,0x6acadded,0xdf4f20d0,0x2458257d,
-		0xda3b7886,0x5c1b1a4c,0xea6f676b,0x59f51e09,
-		0xc0691195,0x8076c61f,0x4221d059,0xd021673a,
-		0x139bd5ef,0x95189046,0x10eb90ea,0x127af4e5,
-		0x14f5dcb8,0x1e13510f,0x6e2e0558,0xa650fce0,
-		0xff0bcd51,0xe218e43d,0xad045536,0xdc4a21d7,
-		0x74edee68,0xb474ad57,0x79514004,0xa65a27a3,0x9e5259c1,0xe78e89eb,
-		0xb34ed292,0x99197f0d };
+			0x03cccb37,0x6acadded,0xdf4f20d0,0x2458257d,
+			0xda3b7886,0x5c1b1a4c,0xea6f676b,0x59f51e09,
+			0xc0691195,0x8076c61f,0x4221d059,0xd021673a,
+			0x139bd5ef,0x95189046,0x10eb90ea,0x127af4e5,
+			0x14f5dcb8,0x1e13510f,0x6e2e0558,0xa650fce0,
+			0xff0bcd51,0xe218e43d,0xad045536,0xdc4a21d7,
+			0x74edee68,0xb474ad57,0x79514004,0xa65a27a3,
+			0x9e5259c1,0xe78e89eb,0xb34ed292,0x99197f0d };
 
-	// create contexts
-	IppsBigNumState* Msg = newBN(sizeof(dataM) / sizeof(dataM[0]), dataM); // create message context
-	IppsBigNumState* C = newBN(sizeof(dataN) / sizeof(dataN[0]));   // create ciphertext context
-	IppsBigNumState* Z = newBN(sizeof(dataN) / sizeof(dataN[0]));   // create de-ciphertext context
 
-	//
-	// encrypt  message
-	//
+	// create contexts for  message and ciphertext, this allocate the 
+	// appropriate memory size for storing message and ciphertext
+
+	// create message context
+	IppsBigNumState* Msg = newBN(sizeof(dataM) / sizeof(dataM[0]), dataM);
+	//create ciphertext context
+	IppsBigNumState* C = newBN(sizeof(dataN) / sizeof(dataN[0]));
+
+
+	// encrypt  message, and return status code for verification
 	IppStatus status1;
 	status1 = ippsRSA_Encrypt(Msg, C, pPub, scratchBuffer);
 
-	// check for successfull encryption of msg
+	// check for successful encryption of msg
 	if (status1 == ippStsNoErr) {
 		cout << "message encryption successful \n" << endl;
 	}
 
-	//
-	// de-crypt  message
-	//
+
+
+	// create de-ciphertext context
+	IppsBigNumState* Z = newBN(sizeof(dataN) / sizeof(dataN[0]));
+
+	// de-crypt  message, and return status code for verification
 	IppStatus status2;
 	status2 = ippsRSA_Decrypt(C, Z, pPrv, scratchBuffer);
 
-	// check for successfull encryption of msg
+	// check for successful decryption of ciphertext
 	if (status2 == ippStsNoErr) {
 		cout << "message decryption successful \n" << endl;
 	}
 
 	// compare plaintext and decrypted message
-	Ipp32u Result;
+	Ipp32u Result; // reference to generated status code
 	ippsCmp_BN(Msg, Z, &Result); // plain text and decrypted cipher text
-	cout << Result <<endl; // comparison 0 --> OK
+
+	cout << Result << endl; // comparison 0 --> OK
 
 	// remove sensitive data before release
 	ippsRSA_InitPrivateKeyType2(bitsP, bitsQ, pPrv, keyCtxSize);
+
+	// delete generators
+	deletePrimeGen(pPrimeG);
+	deletePRNG(pRand);
+
 
 	// release resource
 	delete[] scratchBuffer;
 	delete[](Ipp8u*) pPub;
 	delete[](Ipp8u*) pPrv;
-	
-	return 0;
+
+	return 0; // finish program
 }
 
 int main() { // run program
-	
+
 	RSA_sample(); // run RSA program implemented
 	getchar(); // pause program to view info
-	
+
 	return 0;
 }

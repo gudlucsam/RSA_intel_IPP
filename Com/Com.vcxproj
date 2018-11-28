@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 19.0</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <UseIntelIPP>true</UseIntelIPP>
     <UseIntelDAAL>true</UseIntelDAAL>
@@ -36,7 +36,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 19.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
     <UseIntelIPP>true</UseIntelIPP>
@@ -45,13 +45,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 19.0</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 19.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -74,14 +74,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019\windows\redist\ia32_win\ippcp;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\lib\ia32_win;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019\windows\redist\ia32_win\ippcp;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\lib\ia32_win;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExecutablePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\redist\ia32_win\ippcp;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,6 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include\ippcp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

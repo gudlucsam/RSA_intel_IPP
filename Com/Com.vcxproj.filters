@@ -22,4 +22,9 @@
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\ippcp\include\ippcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
